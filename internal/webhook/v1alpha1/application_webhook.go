@@ -26,6 +26,8 @@ func SetupApplicationWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
+// +kubebuilder:webhook:path=/validate-argoproj-argoproj-io-v1alpha1-application,mutating=false,failurePolicy=fail,sideEffects=None,groups=argoproj.argoproj.io,resources=applications,verbs=create;update,versions=v1alpha1,name=vapplication-v1alpha1.kb.io,admissionReviewVersions=v1
+
 type ApplicationValidator struct {
 	client.Client
 }
