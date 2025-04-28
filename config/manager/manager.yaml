@@ -28,35 +28,8 @@ spec:
       labels:
         control-plane: controller-manager
     spec:
-      # TODO(user): Uncomment the following code to configure the nodeAffinity expression
-      # according to the platforms which are supported by your solution.
-      # It is considered best practice to support multiple architectures. You can
-      # build your manager image using the makefile target docker-buildx.
-      # affinity:
-      #   nodeAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       nodeSelectorTerms:
-      #         - matchExpressions:
-      #           - key: kubernetes.io/arch
-      #             operator: In
-      #             values:
-      #               - amd64
-      #               - arm64
-      #               - ppc64le
-      #               - s390x
-      #           - key: kubernetes.io/os
-      #             operator: In
-      #             values:
-      #               - linux
       securityContext:
         runAsNonRoot: true
-        # TODO(user): For common cases that do not require escalating privileges
-        # it is recommended to ensure that all your Pods/Containers are restrictive.
-        # More info: https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
-        # Please uncomment the following code if your project does NOT have to work on old Kubernetes
-        # versions < 1.19 or on vendors versions which do NOT support this field by default (i.e. Openshift < 4.11 ).
-        # seccompProfile:
-        #   type: RuntimeDefault
       containers:
       - command:
         - /manager
@@ -82,8 +55,6 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
-        # TODO(user): Configure the resources accordingly based on the project requirements.
-        # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
         resources:
           limits:
             cpu: 500m
@@ -91,5 +62,22 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        volumeMounts:
+          - name: cluster-tokens
+            mountPath: /mnt/cluster-tokens
+            readOnly: true
+      volumes:
+        - name: cluster-tokens
+          configMap:
+            name: cluster-tokens
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-tokens
+  namespace: system
+data:
+  https---dana-team-argaas-checker-dns-vg8s8rpo-hcp-westeurope-azmk8s-io-443-token: |
+    eyJhbGciOiJSUzI1NiIsImtpZCI6InJ2RlBmeGNHSVdqVkk5NFphZUxwaFBxbG1iSWFEcVQ0ZThDa3UzTnQxdVEifQ.eyJhdWQiOlsiaHR0cHM6Ly93ZXN0ZXVyb3BlLm9pYy5wcm9kLWFrcy5henVyZS5jb20vYzlhZDk2YTctMmJhYy00OWE3LWFiZjYtOGU5MzJmNjBiZjJiLzFjYTAxNzczLTdjNTgtNDJiYy1iNzIyLWYyY2I1YjM5ZGZhYy8iLCJodHRwczovL2RhbmEtdGVhbS1hcmdhYXMtY2hlY2tlci1kbnMtdmc4czhycG8uaGNwLndlc3RldXJvcGUuYXptazhzLmlvIiwiXCJkYW5hLXRlYW0tYXJnYWFzLWNoZWNrZXItZG5zLXZnOHM4cnBvLmhjcC53ZXN0ZXVyb3BlLmF6bWs4cy5pb1wiIl0sImV4cCI6MTc0NTg0Njg1NywiaWF0IjoxNzQ1ODQzMjU3LCJpc3MiOiJodHRwczovL3dlc3RldXJvcGUub2ljLnByb2QtYWtzLmF6dXJlLmNvbS9jOWFkOTZhNy0yYmFjLTQ5YTctYWJmNi04ZTkzMmY2MGJmMmIvMWNhMDE3NzMtN2M1OC00MmJjLWI3MjItZjJjYjViMzlkZmFjLyIsImp0aSI6ImIyNGViOTM2LTk5ZjUtNDM3My05YzIxLTZlMmMzMmRlNTJhOCIsImt1YmVybmV0ZXMuaW8iOnsibmFtZXNwYWNlIjoiZGFuYSIsInNlcnZpY2VhY2NvdW50Ijp7Im5hbWUiOiJkYW5hIiwidWlkIjoiNmNhZjRiZWEtZGIzYS00NjhmLWFkZTQtMGEwYjNlOTgyZDVlIn19LCJuYmYiOjE3NDU4NDMyNTcsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkYW5hOmRhbmEifQ.K_7Q-Z_2ZqxNMsWe1Y8gcJxkgMzYI6WKfS2Huu8vFcl9gjy-3-wZ48R5rmPAsHTlpakNFJrdDyFOMran6ksRo8-bGc8M3H9PHtYeOHA1n9efPZSZ-nQJFPbaXTIr3oiiYE1aft5SvEw5cWTSTQ1QMGPZJme5UoGW52BUzk1xqA9umTwft6fNHp9qqf-vczmEleP8xE8ncxkHFMggXzmXsAWOzTcCeqYJMSbQN3r3sVXKOd41BHDXTccp0rVDvxZ761YfrxcVx67UXReNqDDGVmQReyt2zpX0Gc-r_p3ZW08ZnWOv0Gl9EgrCG0648wMn6I55ZbkvcjqQufWV1RL1Fe1CnzTFdYYhvJQooDYIMm7IWs5BLyZmFC5UydFCvTevwYH10wTt3RhOm1jJsf4Y2yrniskf1yw3nwQ21q2nkKKaU3rfmCyTiHjvN80uDqLPwxdgBsH06Qg_7nCOCLunIEQiXmu9HMaARqHTz20VB06lIqsEgXXlGwEdhc5Fuc_N4f54-jpQipdKGtHoCbvBvFSu-6T36iHS1RBedaiSV8t7QAdUrWx0QFOKCCzzUAb2F49oxH_h7labJbrHj1tlp2nn3f2bazZNpZRvQRkmyLHyAC0A-v6VIRmWLgrfkFMO02xRrbVCAbJFunWg4qx5LD7JaalxSIFg-nPX3BDIjJo
