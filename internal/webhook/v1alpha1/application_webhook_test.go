@@ -28,17 +28,14 @@ var _ = Describe("Application Webhook", func() {
 	var (
 		obj       *argoprojv1alpha1.Application
 		oldObj    *argoprojv1alpha1.Application
-		validator ApplicationCustomValidator
-		defaulter ApplicationCustomDefaulter
+		validator ApplicationValidator
 	)
 
 	BeforeEach(func() {
 		obj = &argoprojv1alpha1.Application{}
 		oldObj = &argoprojv1alpha1.Application{}
-		validator = ApplicationCustomValidator{}
+		validator = ApplicationValidator{}
 		Expect(validator).NotTo(BeNil(), "Expected validator to be initialized")
-		defaulter = ApplicationCustomDefaulter{}
-		Expect(defaulter).NotTo(BeNil(), "Expected defaulter to be initialized")
 		Expect(oldObj).NotTo(BeNil(), "Expected oldObj to be initialized")
 		Expect(obj).NotTo(BeNil(), "Expected obj to be initialized")
 		// TODO (user): Add any setup logic common to all tests
